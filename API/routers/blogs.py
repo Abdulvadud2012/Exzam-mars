@@ -175,7 +175,7 @@ async def create_save(
     user: UserTable = Depends(UserHandling().user)
 ):
 
-    post = session.execute(select(PostTable).where(PostTable.id == data.post_id)).scalar()
+   post = session.execute(select(PostTable).where(PostTable.id == data.post_id)).scalar()
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
@@ -186,17 +186,9 @@ async def create_save(
         session.delete(existing_save)
         session.commit()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Save is Deleted')
-
-
-    new_save = PostSaveTable(
-        user_id=user.id,
-        post_id=post.id,
-    )
-    if not existing_save:
-        session.add(new_save)
+    else:
+        session.add(PostSaveTable(user_id=user.id, post_id=post.id))
         session.commit()
-        session.refresh(new_save)
-
     return {
         "message": "Save Created!"
     }
